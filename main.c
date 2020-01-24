@@ -73,6 +73,7 @@ int main(int argc, char* argv[])
 	size_t list_len;
 	struct list_node *list = NULL, *node;
 	struct result* results;
+	struct timespec res;
 
 	while (!feof(stdin) && peek(stdin) != EOF) {
 		const char *error;
@@ -103,8 +104,10 @@ int main(int argc, char* argv[])
 		}
 
 		node = malloc(sizeof(struct list_node));
-		if (!node)
+		if (!node) {
+			fputs("failed to allocate puzzle node\n", stderr);
 			return -ENOMEM;
+		}
 
 		for (i = 0; i < SUDOKU_AXIS_SIZE; ++i)
 			for (j = 0; j < SUDOKU_AXIS_SIZE; ++j)
@@ -128,8 +131,10 @@ int main(int argc, char* argv[])
 
 	results = calloc(sizeof(struct result) + (sizeof(uint64_t) * list_len),
 		argc - 1);
-	if (!results)
+	if (!results) {
+		fputs("failed to allocate results\n", stderr);
 		return -ENOMEM;
+	}
 
 	// clear any potential dlerrors
 	dlerror();
@@ -161,8 +166,10 @@ int main(int argc, char* argv[])
 			status = insert(
 				results[i].data, results[i].successes,
 				list_len, duration);
-			if (status < 0)
+			if (status < 0) {
+				fputs("failed to insert stat\n", stderr);
 				return status;
+			}
 
 			results[i].successes++;
 		}
